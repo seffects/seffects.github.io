@@ -1,6 +1,6 @@
 name: html-validation
 run-name: ${{ github.actor }} is learning GitHub Actions
-on: [pull]
+on: [pull_request]
 jobs:
   html-validation:
     runs-on: ubuntu-latest
