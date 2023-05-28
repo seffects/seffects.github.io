@@ -1,6 +1,6 @@
 # Midejourney 
 
-**Paper Art ** is always fascinating to me. Midjourney can create paper cuts or paper art images. Here’s what I tested for Cat.
+**Paper Art** is always fascinating to me. Midjourney can create paper cuts or paper art images. Here’s what I tested for Cat.
 
 In terms of faces or details, paper craft or paper artwork is better. In paper cuts, some of the faces or details are blurred and cannot be recognized correctly. Also, I am not sure how Midjourney interprets ‘happy’ as an animal’s emotion.
 
