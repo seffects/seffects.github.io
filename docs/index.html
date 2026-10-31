@@ -5,153 +5,248 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>하루 마을</title>
 <style>
+  @font-face { font-family: Galmuri11; src: url('fonts/Galmuri11.woff2') format('woff2'); font-display: swap; }
+  @font-face { font-family: Galmuri11; font-weight: 700; src: url('fonts/Galmuri11-Bold.woff2') format('woff2'); font-display: swap; }
   :root {
-    --bg: #f4f1ea;
-    --card: #ffffff;
-    --text: #2b2b2b;
-    --muted: #7a7468;
-    --line: #e2ddd2;
-    --accent: #e8743b;
-    --accent-text: #ffffff;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1c1d22;
-      --card: #26272e;
-      --text: #ecebe6;
-      --muted: #a09c93;
-      --line: #393a42;
-      --accent: #f08a50;
-      --accent-text: #1c1d22;
-    }
+    --ink: #1a1c2c;
+    --paper: #f4ecd8;
+    --white: #f4f4f4;
+    --navy: #29366f;
+    --blue: #3b5dc9;
+    --orange: #ef7d57;
+    --yellow: #ffcd75;
+    --red: #b13e53;
+    --slate: #333c57;
+    --gray: #94b0c2;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    color: var(--ink);
+    font-family: Galmuri11, monospace;
+    font-size: 14px;
+    background-color: var(--navy);
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 2px, transparent 2px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 2px, transparent 2px);
+    background-size: 16px 16px;
   }
   .wrap { max-width: 1040px; margin: 0 auto; padding: 16px; }
-  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-  h1 { font-size: 22px; margin: 0; }
-  h2 { font-size: 16px; margin: 0 0 10px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
-  canvas { display: block; width: 100%; height: auto; border-radius: 10px; }
-  #timeline { margin-top: 10px; cursor: pointer; border-radius: 6px; }
-  .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .clock { font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 700; margin-left: auto; }
-  button, select, input {
-    font: inherit; color: var(--text); background: var(--card);
-    border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  h1 {
+    margin: 0; font-size: 28px; font-weight: 700; color: var(--yellow);
+    text-shadow: 3px 3px 0 var(--ink), -1px -1px 0 var(--ink), 1px -1px 0 var(--ink), -1px 1px 0 var(--ink);
+    letter-spacing: 1px;
   }
+  h1 small { display: block; font-size: 12px; font-weight: 400; color: var(--gray); text-shadow: none; letter-spacing: 0; margin-top: 2px; }
+
+  .win { background: var(--paper); border: 4px solid var(--ink); box-shadow: 6px 6px 0 rgba(10,12,24,0.6); margin-bottom: 20px; }
+  .win-title {
+    background: var(--blue); color: var(--white); font-weight: 700; padding: 6px 10px;
+    border-bottom: 4px solid var(--ink); display: flex; align-items: center; gap: 8px;
+  }
+  .win-title::before { content: ''; width: 8px; height: 8px; background: var(--yellow); box-shadow: 0 0 0 2px var(--ink); }
+  .win-title.orange { background: var(--orange); color: var(--ink); }
+  .win-title.red { background: var(--red); }
+  .win-body { padding: 12px; }
+
+  canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+  #world, #timeline { display: block; width: 100%; height: auto; border: 4px solid var(--ink); }
+  #timeline { margin-top: 10px; cursor: pointer; }
+
+  button, select, input {
+    font: inherit; color: var(--ink); background: var(--white);
+    border: 3px solid var(--ink); border-radius: 0; padding: 6px 10px;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  input, select { box-shadow: inset 3px 3px 0 rgba(26,28,44,0.15); }
   button { cursor: pointer; }
-  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
-  .quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
-  .quick button { padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 13px; }
-  .quick button span { font-size: 22px; }
-  .hint { color: var(--muted); font-size: 13px; margin: 6px 0 10px; }
-  form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  form label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+  button:active { transform: translate(3px, 3px); box-shadow: none; }
+  button.primary { background: var(--orange); font-weight: 700; }
+  button.yellow { background: var(--yellow); font-weight: 700; }
+  :focus-visible { outline: 3px dashed var(--orange); outline-offset: 2px; }
+
+  .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .controls .spacer { flex: 1; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; gap: 0; } }
+
+  .quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
+  .quick button {
+    padding: 8px 2px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    border-bottom-width: 8px; font-size: 13px;
+  }
+  .icon { width: 27px; height: 27px; flex: none; }
+  .hint { color: var(--slate); font-size: 12px; margin: 0 0 12px; line-height: 1.6; }
+
+  form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--slate); }
   form .full { grid-column: 1 / -1; }
+  form input, form select { width: 100%; }
+
   ul { list-style: none; margin: 0; padding: 0; }
-  li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  li { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 3px dotted rgba(26,28,44,0.25); }
   li:last-child { border-bottom: 0; }
-  li .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-  li .time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; width: 96px; flex: none; }
+  li .time { font-variant-numeric: tabular-nums; width: 112px; flex: none; color: var(--slate); }
+  li .chip { width: 12px; height: 12px; flex: none; box-shadow: 0 0 0 2px var(--ink); }
   li .what { flex: 1; min-width: 0; }
-  li .memo { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  li button { padding: 4px 8px; font-size: 12px; }
-  .empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
+  li .memo { color: var(--slate); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  li button { padding: 2px 8px; font-size: 12px; box-shadow: 2px 2px 0 var(--ink); background: var(--yellow); }
+  .empty { color: var(--slate); padding: 8px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>🏘️ 하루 마을</h1>
+    <h1>하루 마을<small>내 하루를 기록하면, 마을의 내가 그대로 살아요</small></h1>
     <input type="date" id="date">
   </header>
 
-  <div class="card">
-    <canvas id="world" width="1000" height="560"></canvas>
-    <canvas id="timeline" width="1000" height="44"></canvas>
-    <div class="controls">
-      <button id="play" class="primary">▶ 재생</button>
-      <select id="speed" title="하루를 몇 초에 재생할지">
-        <option value="30">하루 = 30초</option>
-        <option value="60" selected>하루 = 1분</option>
-        <option value="120">하루 = 2분</option>
-        <option value="300">하루 = 5분</option>
-      </select>
-      <button id="now">지금 시각으로</button>
-      <div class="clock" id="clock">00:00</div>
+  <section class="win">
+    <div class="win-title">마을</div>
+    <div class="win-body">
+      <canvas id="world" width="1280" height="720"></canvas>
+      <canvas id="timeline" width="1280" height="72"></canvas>
+      <div class="controls">
+        <button id="play" class="primary">▶ 재생</button>
+        <select id="speed" title="하루를 몇 초에 재생할지">
+          <option value="30">하루 = 30초</option>
+          <option value="60" selected>하루 = 1분</option>
+          <option value="120">하루 = 2분</option>
+          <option value="300">하루 = 5분</option>
+        </select>
+        <span class="spacer"></span>
+        <button id="now" class="yellow">지금 시각으로</button>
+      </div>
     </div>
-  </div>
+  </section>
 
   <div class="grid2">
-    <div class="card">
-      <h2>지금 하는 일 기록</h2>
-      <p class="hint">누르면 지금 시각부터 그 일을 시작한 걸로 기록되고, 하던 일은 끝난 걸로 처리돼요.</p>
-      <div class="quick" id="quick"></div>
-    </div>
+    <section class="win">
+      <div class="win-title orange">지금 하는 일</div>
+      <div class="win-body">
+        <p class="hint">누르면 지금 시각부터 그 일을 시작한 걸로 기록돼요.<br>하던 일은 끝난 걸로 처리돼요.</p>
+        <div class="quick" id="quick"></div>
+      </div>
+    </section>
 
-    <div class="card">
-      <h2>시간 지정해서 기록</h2>
-      <form id="form">
-        <label>시작 <input type="time" id="fStart" required></label>
-        <label>끝 <input type="time" id="fEnd" required></label>
-        <label>활동 <select id="fAct"></select></label>
-        <label>장소 <select id="fPlace"></select></label>
-        <label class="full">메모 <input type="text" id="fMemo" placeholder="선택"></label>
-        <button class="primary full" type="submit">기록 추가</button>
-      </form>
-    </div>
+    <section class="win">
+      <div class="win-title orange">시간 지정해서 기록</div>
+      <div class="win-body">
+        <form id="form">
+          <label>시작 <input type="time" id="fStart" required></label>
+          <label>끝 <input type="time" id="fEnd" required></label>
+          <label>활동 <select id="fAct"></select></label>
+          <label>장소 <select id="fPlace"></select></label>
+          <label class="full">메모 <input type="text" id="fMemo" placeholder="선택"></label>
+          <button class="primary full" type="submit">기록 추가</button>
+        </form>
+      </div>
+    </section>
   </div>
 
-  <div class="card">
-    <h2>오늘의 기록</h2>
-    <ul id="list"></ul>
-  </div>
+  <section class="win">
+    <div class="win-title red" id="listTitle">오늘의 기록</div>
+    <div class="win-body"><ul id="list"></ul></div>
+  </section>
 </div>
 
 <script>
-// ---------- 데이터 정의 ----------
-const W = 1000, H = 560, ROAD_Y = 300;
-
-const PLACES = {
-  home:       { name: '집',     emoji: '🏠', x: 60,  y: 110, w: 170, h: 140, color: '#f2c38b', roof: '#c4553a' },
-  cafe:       { name: '카페',   emoji: '☕', x: 290, y: 140, w: 130, h: 110, color: '#d9b99b', roof: '#6b4a35' },
-  restaurant: { name: '식당',   emoji: '🍜', x: 470, y: 140, w: 130, h: 110, color: '#f5d77a', roof: '#d0662b' },
-  office:     { name: '회사',   emoji: '🏢', x: 680, y: 40,  w: 260, h: 210, color: '#a9c1d9', roof: '#4c6a8a' },
-  park:       { name: '공원',   emoji: '🌳', x: 60,  y: 360, w: 300, h: 170, color: null },
-  gym:        { name: '헬스장', emoji: '🏋️', x: 430, y: 360, w: 180, h: 130, color: '#c5b3d9', roof: '#6a4f8a' },
-  mart:       { name: '마트',   emoji: '🛒', x: 690, y: 360, w: 230, h: 140, color: '#b9dcb0', roof: '#3f8a4a' },
+// ================= 팔레트 & 스프라이트 =================
+const K = '#1a1c2c';
+const PAL = {
+  k: K, w: '#f4f4f4', g: '#94b0c2', G: '#566c86', y: '#ffcd75', o: '#ef7d57', r: '#b13e53', p: '#5d275d',
+  n: '#38b764', l: '#a7f070', N: '#257179', b: '#3b5dc9', s: '#41a6f6', c: '#73eff7', d: '#29366f',
+  m: '#333c57', B: '#8a5a3c', S: '#f5c9a0',
 };
-// 아바타가 서는 자리: 건물 앞 인도
-for (const p of Object.values(PLACES)) {
-  p.sx = p.x + p.w / 2;
-  p.sy = p.y < ROAD_Y ? p.y + p.h + 18 : p.y - 18;
+const AVATAR_PAL = { k: K, h: '#5a3a2a', s: '#f5c9a0', e: K, c: '#ef7d57', C: '#b13e53', p: '#29366f', b: K };
+
+const ICONS = {
+  sleep:    ['..kkk....', '.kyyk.www', 'kyyk...w.', 'kyyk..www', 'kyyyk....', 'kyyyyk...', '.kyyyykk.', '..kkkkk..'],
+  meal:     ['.........', '..wwwww..', '.wwwwwww.', 'kkkkkkkkk', 'kbbbbbbbk', '.kbbbbbk.', '..kbbbk..', '..kkkkk..'],
+  rest:     ['.........', '.kkkkkkk.', '.krrrrrk.', 'kkrrrrrkk', 'krooooork', 'krrrrrrrk', 'kkkkkkkkk', '.k.....k.'],
+  chores:   ['......kk.', '.....kBk.', '....kBk..', '...kBk...', '..kyk....', '.kyyyk...', 'kyykyyk..', 'kykykyk..', '.kkkkk...'],
+  work:     ['.........', '.kkkkkkk.', '.kccccck.', '.kcwccck.', '.kccccck.', '.kkkkkkk.', 'kgggggggk', 'kkkkkkkkk'],
+  meeting:  ['.kkkkk...', 'kwwwwwk..', 'kwkwkwk..', 'kwwwwwk..', '.kwkkkkkk', '..kkyyyyk', '...kykyyk', '...kyyyyk', '....kkkk.'],
+  coffee:   ['...w.w...', '....w.w..', '.kkkkkk..', '.kwwwwkkk', '.kwBBwk.k', '.kwwwwkkk', '.kwwwwk..', 'kkkkkkkk.'],
+  study:    ['.........', '.kkk.kkk.', 'kwwwkwwwk', 'kwggkggwk', 'kwwwkwwwk', 'kwggkggwk', 'kwwwkwwwk', '.kkkkkkk.', '...kkk...'],
+  eatout:   ['....k..k.', '....k.k..', '..yyyky..', 'kkkkkkkkk', 'koooooook', '.koooook.', '..koook..', '..kkkkk..'],
+  exercise: ['.........', 'kk.....kk', 'kgk...kgk', 'kgkkkkkgk', 'kgGGGGGgk', 'kgkkkkkgk', 'kgk...kgk', 'kk.....kk'],
+  walk:     ['...kkk...', '..knnnk..', '.knlnnnk.', 'knnnnlnnk', 'knlnnnnnk', '.knnnnnk.', '..kkBkk..', '....B....', '...kBk...'],
+  shopping: ['kk.......', '.k.......', '.kkkkkkkk', '.kgkgkgk.', '.kkkkkkk.', '..k...k..', '..kkkkk..', '.kk...kk.', '.kk...kk.'],
+  etc:      ['......kk.', '.....kyyk', '....kyyk.', '...kyyk..', '..kyyk...', '.kSSk....', '.kkk.....', 'k........'],
+  move:     ['.........', '....k....', '....kyk..', 'kkkkkyyk.', 'kyyyyyyyk', 'kkkkkyyk.', '....kyk..', '....k....'],
+  idle:     ['.........', '.........', '.........', '.........', '.k..k..k.', '.........'],
+  sun:      ['....y....', '.y..y..y.', '..yyyyy..', '.yyyyyyy.', 'yyyyyyyyy', '.yyyyyyy.', '..yyyyy..', '.y..y..y.', '....y....'],
+  moon:     ['..kkk....', '.kyyk....', 'kyyk.....', 'kyyk.....', 'kyyyk....', 'kyyyyk...', '.kyyyykk.', '..kkkkk..'],
+};
+
+const AV = {
+  front: ['..kkkkk..', '.khhhhhk.', 'khhhhhhhk', 'khssssshk', 'ksesssesk', 'ksssssssk', '.kccccck.', 'kcCcccCck', 'ksCcccCsk', '.kccccck.', '.kpppppk.', '.kppkppk.', '.kppkppk.', '.bbb.bbb.'],
+  frontA: null, frontB: null,
+  side: ['..kkkkk..', '.khhhhhk.', 'khhhhhhhk', 'khhhssssk', 'khhsssesk', '.ksssssk.', '..kccck..', '.kcccCck.', '.kccCsck.', '.kcccck..', '.kppppk..', '.kpkkpk..'],
+};
+AV.frontA = AV.front.slice(0, 11).concat(['.kppkppk.', '.kppk.bb.', '.bbb.....']);
+AV.frontB = AV.front.slice(0, 11).concat(['.kppkppk.', '.bb.kppk.', '.....bbb.']);
+AV.sideA = AV.side.concat(['.kpk.kpk.', '.bbk..bbk']);
+AV.sideB = AV.side.concat(['..kpkpk..', '..bbbb...']);
+AV.sideStand = AV.side.concat(['..kpkpk..', '..bbbbb..']);
+
+const TREE = ['...kkkkk...', '..knnnnnk..', '.knnlnnnnk.', 'knnlnnnnnnk', 'knnnnnnlnnk', 'knlnnnnnnnk', '.kNnnnnnNk.', '..kkNNNkk..', '....kBk....', '....kBk....', '...kkkkk...'];
+
+function drawSprite(c, rows, pal, x, y, scale = 1, flip = false) {
+  const w = Math.max(...rows.map(r => r.length));
+  rows.forEach((row, j) => {
+    for (let i = 0; i < row.length; i++) {
+      const ch = row[i];
+      if (ch === '.' || !pal[ch]) continue;
+      c.fillStyle = pal[ch];
+      const xi = flip ? w - 1 - i : i;
+      c.fillRect(x + xi * scale, y + j * scale, scale, scale);
+    }
+  });
 }
 
+function iconCanvas(name) {
+  const cv = document.createElement('canvas');
+  cv.width = 9; cv.height = 9; cv.className = 'icon';
+  const rows = ICONS[name] || ICONS.etc;
+  drawSprite(cv.getContext('2d'), rows, PAL, 0, Math.floor((9 - rows.length) / 2));
+  return cv;
+}
+
+// ================= 데이터 정의 =================
+const LW = 320, LH = 180, SCALE = 4, RC = 102; // 저해상도 월드, 도로 중앙 y
+
+const PLACES = {
+  home:       { name: '집',     sign: [44, 22],  approach: [[44, RC], [44, 91]] },
+  cafe:       { name: '카페',   sign: [116, 36], approach: [[116, RC], [116, 91]] },
+  restaurant: { name: '식당',   sign: [178, 36], approach: [[178, RC], [178, 91]] },
+  office:     { name: '회사',   sign: [265, 1],  approach: [[265, RC], [265, 91]] },
+  park:       { name: '공원',   sign: [88, 120], approach: [[41, RC], [41, 150], [64, 150]] },
+  gym:        { name: '헬스장', sign: [170, 113], approach: [[132, RC], [132, 167], [170, 167]] },
+  mart:       { name: '마트',   sign: [265, 113], approach: [[213, RC], [213, 169], [265, 169]] },
+};
+for (const p of Object.values(PLACES)) [p.sx, p.sy] = p.approach[p.approach.length - 1];
+
 const ACTS = {
-  sleep:    { name: '수면',   emoji: '😴', place: 'home',       color: '#5b6bb5' },
-  meal:     { name: '식사',   emoji: '🍚', place: 'home',       color: '#e8a33b' },
-  rest:     { name: '휴식',   emoji: '🛋️', place: 'home',       color: '#8fb3a8' },
-  chores:   { name: '집안일', emoji: '🧹', place: 'home',       color: '#b58f6b' },
-  work:     { name: '업무',   emoji: '💻', place: 'office',     color: '#3b82c4' },
-  meeting:  { name: '회의',   emoji: '🗣️', place: 'office',     color: '#2a5f99' },
-  coffee:   { name: '커피',   emoji: '☕', place: 'cafe',       color: '#8a5a3c' },
-  study:    { name: '공부',   emoji: '📚', place: 'cafe',       color: '#c0507a' },
-  eatout:   { name: '외식',   emoji: '🍜', place: 'restaurant', color: '#e06a3b' },
-  exercise: { name: '운동',   emoji: '🏋️', place: 'gym',        color: '#8a5ac4' },
-  walk:     { name: '산책',   emoji: '🌳', place: 'park',       color: '#4a9a5a' },
-  shopping: { name: '장보기', emoji: '🛒', place: 'mart',       color: '#3fa08a' },
-  etc:      { name: '기타',   emoji: '✏️', place: 'home',       color: '#888888' },
+  sleep:    { name: '수면',   place: 'home',       color: '#29366f' },
+  meal:     { name: '식사',   place: 'home',       color: '#ffcd75' },
+  rest:     { name: '휴식',   place: 'home',       color: '#73eff7' },
+  chores:   { name: '집안일', place: 'home',       color: '#94b0c2' },
+  work:     { name: '업무',   place: 'office',     color: '#3b5dc9' },
+  meeting:  { name: '회의',   place: 'office',     color: '#41a6f6' },
+  coffee:   { name: '커피',   place: 'cafe',       color: '#8a5a3c' },
+  study:    { name: '공부',   place: 'cafe',       color: '#5d275d' },
+  eatout:   { name: '외식',   place: 'restaurant', color: '#ef7d57' },
+  exercise: { name: '운동',   place: 'gym',        color: '#b13e53' },
+  walk:     { name: '산책',   place: 'park',       color: '#38b764' },
+  shopping: { name: '장보기', place: 'mart',       color: '#a7f070' },
+  etc:      { name: '기타',   place: 'home',       color: '#566c86' },
 };
 
-// ---------- 저장 ----------
+// ================= 저장 =================
 const store = {
   get(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } },
   set(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} },
@@ -184,12 +279,11 @@ function segments() {
   }).filter(s => s.end > s.start);
 }
 
-// ---------- 아바타 위치 계산 ----------
+// ================= 아바타 위치 =================
 const TRAVEL_MIN = 20; // 장소 이동에 쓰는 가상 시간(분)
 
 function pathBetween(a, b) {
-  const pa = PLACES[a], pb = PLACES[b];
-  return [[pa.sx, pa.sy], [pa.sx, ROAD_Y], [pb.sx, ROAD_Y], [pb.sx, pb.sy]];
+  return [...PLACES[a].approach].reverse().concat(PLACES[b].approach);
 }
 
 function pointOnPath(pts, f) {
@@ -201,13 +295,16 @@ function pointOnPath(pts, f) {
   }
   let d = f * total;
   for (let i = 0; i < lens.length; i++) {
+    if (lens[i] === 0) continue;
     if (d <= lens[i] || i === lens.length - 1) {
-      const k = lens[i] ? Math.min(1, d / lens[i]) : 1;
-      return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * k, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * k];
+      const k = Math.min(1, d / lens[i]);
+      const [ax, ay] = pts[i], [bx, by] = pts[i + 1];
+      return { x: ax + (bx - ax) * k, y: ay + (by - ay) * k, dx: bx - ax, dy: by - ay };
     }
     d -= lens[i];
   }
-  return pts[pts.length - 1];
+  const [x, y] = pts[pts.length - 1];
+  return { x, y, dx: 0, dy: 1 };
 }
 
 function avatarAt(t, segs) {
@@ -215,159 +312,291 @@ function avatarAt(t, segs) {
   for (const s of segs) {
     if (t < s.start) break;
     if (t < s.end) {
-      const act = ACTS[s.act] || ACTS.etc;
+      const act = ACTS[s.act] ? s.act : 'etc';
       if (s.place !== prevPlace) {
         const travel = Math.min(TRAVEL_MIN, (s.end - s.start) / 2);
         if (t < s.start + travel) {
-          const [x, y] = pointOnPath(pathBetween(prevPlace, s.place), (t - s.start) / travel);
-          return { x, y, moving: true, label: `${PLACES[s.place].name}(으)로 이동 중`, emoji: '🚶' };
+          const p = pointOnPath(pathBetween(prevPlace, s.place), (t - s.start) / travel);
+          return { ...p, moving: true, label: `${PLACES[s.place].name}(으)로 이동 중`, icon: 'move' };
         }
       }
       const p = PLACES[s.place];
-      return { x: p.sx, y: p.sy, moving: false, label: act.name, emoji: act.emoji, memo: s.memo };
+      return { x: p.sx, y: p.sy, moving: false, label: ACTS[act].name, icon: act };
     }
     prevPlace = s.place;
   }
   const p = PLACES[prevPlace];
   const idle = segs.length === 0 || t < segs[0].start;
-  return { x: p.sx, y: p.sy, moving: false, label: idle ? '대기' : '기록 없음', emoji: '💭' };
+  return { x: p.sx, y: p.sy, moving: false, label: idle ? '대기 중' : '기록 없음', icon: 'idle' };
 }
 
-// ---------- 그리기 ----------
-const world = document.getElementById('world');
-const ctx = world.getContext('2d');
+// ================= 배경(정적) 그리기 =================
+function rng(seed) {
+  return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+
+const WINDOWS = [];   // 밤에 불이 켜지는 창문
+const LAMPS = [84, 146, 214, 316];
+
+function buildBackground() {
+  const bg = document.createElement('canvas');
+  bg.width = LW; bg.height = LH;
+  const c = bg.getContext('2d');
+  const r = (x, y, w, h, col) => { c.fillStyle = col; c.fillRect(x, y, w, h); };
+  const box = (x, y, w, h, col) => { r(x, y, w, h, K); r(x + 1, y + 1, w - 2, h - 2, col); };
+  const win = (x, y, w, h) => {
+    box(x, y, w, h, '#73eff7');
+    r(x + 1, y + 1, w - 2, 1, '#f4f4f4');
+    r(x + Math.floor(w / 2), y + 1, 1, h - 2, K);
+    WINDOWS.push([x + 1, y + 1, w - 2, h - 2]);
+  };
+  const rand = rng(7);
+
+  // 잔디
+  for (let y = 0; y < LH; y += 4) for (let x = 0; x < LW; x += 4) r(x, y, 4, 4, rand() < 0.5 ? '#4fa84a' : '#479c43');
+  for (let i = 0; i < 260; i++) {
+    const x = Math.floor(rand() * LW), y = Math.floor(rand() * LH);
+    if (rand() < 0.8) { r(x, y, 1, 2, '#6cc25a'); r(x + 2, y + 1, 1, 1, '#6cc25a'); }
+    else { r(x, y, 1, 1, ['#f4f4f4', '#ffcd75', '#ef7d57'][i % 3]); }
+  }
+
+  // 인도 & 도로
+  r(0, 86, LW, 8, '#c9bfa8'); r(0, 110, LW, 8, '#c9bfa8');
+  for (let x = 0; x < LW; x += 8) { r(x, 86, 1, 8, '#a89e8a'); r(x + 4, 110, 1, 8, '#a89e8a'); }
+  r(0, 86, LW, 1, '#a89e8a'); r(0, 117, LW, 1, '#a89e8a');
+  r(0, 93, LW, 1, '#7d7568'); r(0, 110, LW, 1, '#7d7568');
+  r(0, 94, LW, 16, '#4a4e5a');
+  for (let x = 0; x < LW; x += 3) r(x, 94 + ((x * 7) % 16), 1, 1, '#555a68');
+  for (let x = 4; x < LW; x += 16) r(x, 101, 8, 2, '#ffcd75');
+
+  // 흙길 (도로 아래쪽 장소로 가는 길)
+  for (const id of ['park', 'gym', 'mart']) {
+    const pts = PLACES[id].approach.map(([x, y], i) => [x, i === 0 ? 116 : y]);
+    for (let i = 1; i < pts.length; i++) {
+      const [ax, ay] = pts[i - 1], [bx, by] = pts[i];
+      const x0 = Math.min(ax, bx) - 3, y0 = Math.min(ay, by) - 3;
+      r(x0, y0, Math.abs(bx - ax) + 7, Math.abs(by - ay) + 7, '#c9a66b');
+    }
+  }
+
+  // 집
+  box(56, 30, 7, 14, '#8a5a3c');
+  for (let j = 0; j < 19; j++) {
+    const half = Math.min(33, 12 + Math.floor(j * 1.3));
+    r(44 - half, 34 + j, half * 2, 1, j % 4 === 3 ? '#7d2a3d' : '#b13e53');
+    r(44 - half - 1, 34 + j, 1, 1, K); r(44 + half, 34 + j, 1, 1, K);
+  }
+  r(32, 33, 24, 1, K); r(10, 53, 68, 1, K);
+  box(17, 53, 54, 35, '#f4e4c1');
+  r(18, 54, 52, 2, '#d9c7a0');
+  win(23, 60, 13, 10); win(52, 60, 13, 10);
+  r(23, 70, 13, 2, '#38b764'); r(25, 70, 1, 1, '#ef7d57'); r(30, 70, 1, 1, '#f4f4f4'); r(34, 70, 1, 1, '#ef7d57');
+  r(52, 70, 13, 2, '#38b764'); r(55, 70, 1, 1, '#ffcd75'); r(60, 70, 1, 1, '#ef7d57');
+  box(39, 71, 11, 17, '#8a5a3c'); r(41, 73, 7, 5, '#6b4430'); r(41, 80, 7, 6, '#6b4430'); r(47, 79, 1, 1, '#ffcd75');
+
+  // 카페
+  box(90, 46, 52, 6, '#5d275d');
+  box(92, 51, 48, 37, '#d9b99b');
+  for (let i = 0; i < 12; i++) { r(92 + i * 4, 58, 4, 6, i % 2 ? '#f4f4f4' : '#b13e53'); r(93 + i * 4, 64, 2, 1, i % 2 ? '#f4f4f4' : '#b13e53'); }
+  r(92, 57, 48, 1, K);
+  win(95, 68, 15, 12); win(124, 68, 13, 12);
+  box(111, 70, 11, 18, '#5d275d'); r(113, 72, 7, 7, '#73eff7'); r(119, 80, 1, 1, '#ffcd75');
+  r(97, 82, 3, 6, '#8a5a3c'); r(96, 81, 5, 1, K);
+
+  // 식당
+  box(150, 45, 56, 6, '#ef7d57');
+  for (let x = 152; x < 204; x += 4) r(x, 46, 1, 4, '#b13e53');
+  box(152, 50, 52, 38, '#ffcd75');
+  r(153, 51, 50, 2, '#e6b45e');
+  win(156, 58, 13, 11); win(187, 58, 13, 11);
+  box(172, 66, 13, 22, '#333c57');
+  for (let i = 0; i < 3; i++) r(173 + i * 4, 67, 3, 7, '#29366f');
+  r(165, 60, 3, 6, '#b13e53'); r(165, 59, 3, 1, K); r(165, 66, 3, 1, K);
+  r(189, 60, 3, 6, '#b13e53'); r(189, 59, 3, 1, K); r(189, 66, 3, 1, K);
+
+  // 회사
+  r(292, 0, 1, 8, K); r(291, 0, 3, 1, '#b13e53');
+  box(220, 7, 90, 6, '#333c57');
+  box(222, 12, 86, 76, '#566c86');
+  for (let row = 0; row < 5; row++) for (let col = 0; col < 6; col++) win(227 + col * 13, 17 + row * 11, 10, 8);
+  box(252, 72, 27, 3, '#333c57');
+  box(256, 74, 19, 14, '#73eff7'); r(265, 75, 1, 13, K); r(257, 75, 3, 1, '#f4f4f4');
+  r(240, 80, 8, 8, '#2f7a35'); r(282, 80, 8, 8, '#2f7a35'); r(239, 79, 10, 1, K); r(281, 79, 10, 1, K);
+
+  // 공원
+  box(8, 120, 116, 56, '#5cb84f');
+  r(9, 121, 114, 3, '#2f7a35'); r(9, 172, 114, 3, '#2f7a35'); r(9, 121, 3, 54, '#2f7a35'); r(120, 121, 3, 54, '#2f7a35');
+  r(36, 120, 11, 5, '#c9a66b');
+  for (let j = -9; j <= 9; j++) {
+    const half = Math.round(18 * Math.sqrt(1 - (j / 10) ** 2));
+    r(92 - half, 148 + j, half * 2, 1, '#41a6f6');
+    r(92 - half - 1, 148 + j, 1, 1, '#3b5dc9'); r(92 + half, 148 + j, 1, 1, '#3b5dc9');
+  }
+  r(84, 144, 5, 1, '#f4f4f4'); r(97, 151, 4, 1, '#f4f4f4'); r(80, 152, 2, 1, '#73eff7');
+  r(54, 158, 16, 3, '#8a5a3c'); r(54, 157, 16, 1, K); r(55, 161, 1, 3, K); r(68, 161, 1, 3, K);
+  drawSprite(c, TREE, PAL, 14, 126); drawSprite(c, TREE, PAL, 16, 157 - 4); drawSprite(c, TREE, PAL, 104, 125);
+
+  // 헬스장
+  box(138, 118, 64, 6, '#5d275d');
+  box(140, 123, 60, 37, '#94b0c2');
+  r(141, 127, 58, 3, '#5d275d');
+  win(145, 134, 14, 10); win(181, 134, 14, 10);
+  drawSprite(c, ICONS.exercise, PAL, 166, 132);
+  box(164, 146, 13, 14, '#333c57'); r(166, 148, 9, 5, '#73eff7');
+
+  // 마트
+  box(220, 118, 90, 6, '#257179');
+  box(222, 123, 86, 39, '#f4f4f4');
+  for (let i = 0; i < 21; i++) r(223 + i * 4, 129, 4, 6, i % 2 ? '#f4f4f4' : '#38b764');
+  r(223, 135, 84, 1, K);
+  win(228, 139, 24, 14); win(279, 139, 24, 14);
+  box(257, 142, 17, 20, '#73eff7'); r(265, 143, 1, 18, K);
+  drawSprite(c, ICONS.shopping, PAL, 243, 154);
+
+  // 나무 & 가로등
+  drawSprite(c, TREE, PAL, 78, 68); drawSprite(c, TREE, PAL, 207, 68);
+  drawSprite(c, TREE, PAL, 0, 60); drawSprite(c, TREE, PAL, 309, 134);
+  for (const x of LAMPS) { r(x, 76, 1, 12, K); r(x - 1, 74, 3, 2, '#ffcd75'); r(x - 1, 73, 3, 1, K); }
+
+  return bg;
+}
+
+// ================= 프레임 그리기 =================
+const view = document.getElementById('world');
+const vctx = view.getContext('2d');
+const low = document.createElement('canvas');
+low.width = LW; low.height = LH;
+const lctx = low.getContext('2d');
 const tl = document.getElementById('timeline');
 const tctx = tl.getContext('2d');
+let BG = null;
 
 function darkness(t) {
   const h = t / 60;
-  if (h < 5 || h >= 20) return 0.55;
-  if (h < 7) return 0.55 * (7 - h) / 2;
-  if (h >= 18) return 0.55 * (h - 18) / 2;
+  if (h < 5 || h >= 20) return 0.62;
+  if (h < 7) return 0.62 * (7 - h) / 2;
+  if (h >= 18) return 0.62 * (h - 18) / 2;
   return 0;
 }
 
-function drawTree(x, y, r) {
-  ctx.fillStyle = '#7a5532';
-  ctx.fillRect(x - 3, y, 6, r);
-  ctx.fillStyle = '#3f8f4a';
-  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+function drawCar(c, x, y, body, flip, night) {
+  const r = (a, b, w, h, col) => { c.fillStyle = col; c.fillRect(flip ? x + 15 - a - w : x + a, y + b, w, h); };
+  r(0, 2, 16, 4, K); r(1, 3, 14, 2, body);
+  r(4, 0, 8, 3, K); r(5, 1, 6, 2, '#73eff7');
+  r(2, 6, 3, 1, K); r(11, 6, 3, 1, K);
+  r(15, 3, 1, 1, night ? '#fff1b8' : '#f4f4f4');
 }
 
-function drawBuilding(p, dark) {
-  if (!p.color) { // 공원
-    ctx.fillStyle = '#9fd18a';
-    roundRect(p.x, p.y, p.w, p.h, 16); ctx.fill();
-    ctx.strokeStyle = '#d9c9a0'; ctx.lineWidth = 12;
-    ctx.beginPath(); ctx.moveTo(p.x + 20, p.y + p.h - 30); ctx.quadraticCurveTo(p.x + p.w / 2, p.y + 20, p.x + p.w - 20, p.y + p.h - 40); ctx.stroke();
-    drawTree(p.x + 45, p.y + 45, 22); drawTree(p.x + 120, p.y + 120, 18);
-    drawTree(p.x + 230, p.y + 60, 24); drawTree(p.x + 260, p.y + 130, 16);
-    ctx.fillStyle = '#5aa0d8';
-    ctx.beginPath(); ctx.ellipse(p.x + 170, p.y + 65, 34, 18, 0, 0, Math.PI * 2); ctx.fill();
-  } else {
-    ctx.fillStyle = p.color;
-    roundRect(p.x, p.y + 22, p.w, p.h - 22, 6); ctx.fill();
-    ctx.fillStyle = p.roof;
-    roundRect(p.x - 8, p.y, p.w + 16, 28, 6); ctx.fill();
-    // 창문
-    ctx.fillStyle = dark > 0.2 ? '#ffe28a' : '#e9f3fb';
-    const cols = Math.max(2, Math.floor(p.w / 45)), rows = Math.max(1, Math.floor((p.h - 60) / 40));
-    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-      const wx = p.x + 14 + c * ((p.w - 28) / cols), wy = p.y + 40 + r * 40;
-      ctx.fillRect(wx, wy, (p.w - 28) / cols - 12, 22);
-    }
-    // 문
-    ctx.fillStyle = '#5a4030';
-    const dy = p.y < ROAD_Y ? p.y + p.h - 34 : p.y + 22;
-    ctx.fillRect(p.sx - 12, dy, 24, 34);
+function pixelBox(c, x, y, w, h, fill) {
+  // 모서리가 깎인 픽셀 박스 (디스플레이 좌표, 4px 단위)
+  c.fillStyle = K;
+  c.fillRect(x + 4, y, w - 8, h); c.fillRect(x, y + 4, w, h - 8);
+  c.fillStyle = fill;
+  c.fillRect(x + 4, y + 4, w - 8, h - 8);
+}
+
+function drawFrame(t, segs, now) {
+  const dark = darkness(t);
+  lctx.drawImage(BG, 0, 0);
+
+  const night = dark > 0.25;
+  const carX = (speed, off) => ((now / speed + off) % (LW + 40)) - 20;
+  drawCar(lctx, Math.round(carX(45, 0)), 103, '#b13e53', false, night);
+  drawCar(lctx, Math.round(LW - carX(60, 150)), 95, '#3b5dc9', true, night);
+
+  if (dark > 0) { lctx.fillStyle = `rgba(16,20,56,${dark})`; lctx.fillRect(0, 0, LW, LH); }
+  if (night) {
+    for (const [x, y, w, h] of WINDOWS) { lctx.fillStyle = '#ffcd75'; lctx.fillRect(x, y, w, h); lctx.fillStyle = '#fff1b8'; lctx.fillRect(x, y, w, 1); }
+    lctx.fillStyle = 'rgba(255,205,117,0.18)';
+    for (const x of LAMPS) { lctx.fillRect(x - 6, 76, 13, 16); lctx.fillRect(x - 3, 73, 7, 22); lctx.fillStyle = '#fff1b8'; lctx.fillRect(x - 1, 74, 3, 2); lctx.fillStyle = 'rgba(255,205,117,0.18)'; }
   }
+
+  const a = avatarAt(t, segs);
+  const ax = Math.round(a.x), ay = Math.round(a.y);
+  lctx.fillStyle = 'rgba(0,0,0,0.3)'; lctx.fillRect(ax - 4, ay + 1, 9, 2);
+  let sprite = AV.front, flip = false, bob = 0;
+  if (a.moving) {
+    const f = Math.floor(now / 140) % 2;
+    if (Math.abs(a.dx) > Math.abs(a.dy)) { sprite = f ? AV.sideA : AV.sideB; flip = a.dx < 0; }
+    else sprite = f ? AV.frontA : AV.frontB;
+    bob = f;
+  }
+  drawSprite(lctx, sprite, AVATAR_PAL, ax - 4, ay - 13 - bob, 1, flip);
+
+  // 확대해서 화면에 출력
+  vctx.imageSmoothingEnabled = false;
+  vctx.drawImage(low, 0, 0, LW * SCALE, LH * SCALE);
+
   // 간판
-  ctx.font = '600 16px sans-serif';
-  const label = `${p.emoji} ${p.name}`;
-  const tw = ctx.measureText(label).width + 16;
-  const ly = p.color ? p.y + 4 : p.y + 6;
-  ctx.fillStyle = 'rgba(255,255,255,0.9)';
-  roundRect(p.sx - tw / 2, ly, tw, 22, 11); ctx.fill();
-  ctx.fillStyle = '#333'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(label, p.sx, ly + 11);
-}
-
-function roundRect(x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
-}
-
-function drawAvatar(a, now) {
-  const bob = a.moving ? Math.abs(Math.sin(now / 90)) * 5 : Math.sin(now / 500) * 1.5;
-  const x = a.x, y = a.y - bob;
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.beginPath(); ctx.ellipse(a.x, a.y + 14, 12, 4, 0, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#e8743b';
-  roundRect(x - 10, y - 6, 20, 20, 7); ctx.fill();
-  ctx.fillStyle = '#ffd9b8';
-  ctx.beginPath(); ctx.arc(x, y - 16, 11, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#3a2a20';
-  ctx.beginPath(); ctx.arc(x, y - 19, 11, Math.PI, 0); ctx.fill();
-  ctx.fillStyle = '#222';
-  ctx.fillRect(x - 5, y - 15, 2.5, 2.5); ctx.fillRect(x + 3, y - 15, 2.5, 2.5);
+  vctx.font = '700 24px Galmuri11';
+  vctx.textBaseline = 'top'; vctx.textAlign = 'left';
+  for (const p of Object.values(PLACES)) {
+    const w = Math.ceil((vctx.measureText(p.name).width + 24) / 4) * 4;
+    const bx = Math.round((p.sign[0] * SCALE - w / 2) / 4) * 4, by = p.sign[1] * SCALE;
+    pixelBox(vctx, bx, by, w, 36, '#f4ecd8');
+    vctx.fillStyle = K; vctx.fillText(p.name, bx + 12, by + 6);
+  }
 
   // 말풍선
-  ctx.font = '600 15px sans-serif';
-  const text = `${a.emoji} ${a.label}`;
-  const tw = ctx.measureText(text).width + 20;
-  const bx = Math.min(W - tw - 4, Math.max(4, x - tw / 2)), by = y - 64;
-  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5;
-  roundRect(bx, by, tw, 28, 14); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x - 6, by + 28); ctx.lineTo(x, by + 36); ctx.lineTo(x + 6, by + 28); ctx.closePath();
-  ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#fff'; ctx.fillRect(x - 5, by + 26, 10, 3);
-  ctx.fillStyle = '#222'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(text, bx + tw / 2, by + 14);
-}
+  vctx.font = '24px Galmuri11';
+  const tw = Math.ceil(vctx.measureText(a.label).width / 4) * 4;
+  const bw = tw + 27 + 36, bh = 44;
+  const cx = ax * SCALE;
+  let bx = Math.round((cx - bw / 2) / 4) * 4;
+  bx = Math.max(4, Math.min(LW * SCALE - bw - 4, bx));
+  const by = (ay - 14 - bob) * SCALE - bh - 20;
+  pixelBox(vctx, bx, by, bw, bh, '#f4f4f4');
+  vctx.fillStyle = K;
+  vctx.fillRect(cx - 8, by + bh - 4, 16, 8); vctx.fillRect(cx - 4, by + bh + 4, 8, 8);
+  vctx.fillStyle = '#f4f4f4';
+  vctx.fillRect(cx - 4, by + bh - 4, 8, 4);
+  vctx.fillRect(cx - 4, by + bh, 8, 4);
+  const iconRows = ICONS[a.icon] || ICONS.etc;
+  drawSprite(vctx, iconRows, PAL, bx + 12, by + 8 + Math.floor((9 - iconRows.length) / 2) * 3, 3);
+  vctx.fillStyle = K; vctx.fillText(a.label, bx + 12 + 27 + 10, by + 10);
 
-function drawWorld(t, segs, now) {
-  const dark = darkness(t);
-  ctx.fillStyle = '#cfe8b8'; ctx.fillRect(0, 0, W, H);
-  // 도로
-  ctx.fillStyle = '#e8e2d4'; ctx.fillRect(0, ROAD_Y - 48, W, 96);
-  ctx.fillStyle = '#6b6b70'; ctx.fillRect(0, ROAD_Y - 28, W, 56);
-  ctx.strokeStyle = '#f2d36b'; ctx.lineWidth = 3; ctx.setLineDash([22, 16]);
-  ctx.beginPath(); ctx.moveTo(0, ROAD_Y); ctx.lineTo(W, ROAD_Y); ctx.stroke(); ctx.setLineDash([]);
-  for (const p of Object.values(PLACES)) drawBuilding(p, dark);
-  drawTree(620, 70, 18); drawTree(260, 70, 14); drawTree(970, 530, 16); drawTree(400, 520, 14);
-
-  if (dark > 0) { ctx.fillStyle = `rgba(15,20,60,${dark})`; ctx.fillRect(0, 0, W, H); }
-  drawAvatar(avatarAt(t, segs), now);
   // 시계
-  ctx.fillStyle = 'rgba(0,0,0,0.55)'; roundRect(W - 112, 12, 100, 34, 10); ctx.fill();
-  ctx.fillStyle = '#fff'; ctx.font = '700 20px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(`${t / 60 >= 6 && t / 60 < 18 ? '☀️' : '🌙'} ${fmt(t)}`, W - 62, 30);
+  vctx.font = '700 24px Galmuri11';
+  const sunUp = t >= 360 && t < 1080;
+  pixelBox(vctx, 16, 16, 132, 48, sunUp ? '#ffcd75' : '#29366f');
+  drawSprite(vctx, sunUp ? ICONS.sun : ICONS.moon, { ...PAL, y: sunUp ? '#ef7d57' : '#ffcd75' }, 28, 26, 3);
+  vctx.fillStyle = sunUp ? K : '#f4f4f4';
+  vctx.fillText(fmt(t), 64, 28);
 }
 
 function drawTimeline(t, segs) {
-  const tw = tl.width, th = tl.height;
-  tctx.clearRect(0, 0, tw, th);
-  tctx.fillStyle = 'rgba(128,128,128,0.15)'; tctx.fillRect(0, 0, tw, 26);
+  const W = tl.width, barY = 8, barH = 28;
+  tctx.fillStyle = '#f4ecd8'; tctx.fillRect(0, 0, W, tl.height);
+  tctx.fillStyle = '#333c57'; tctx.fillRect(0, barY, W, barH);
+  for (let h = 0; h < 24; h++) { tctx.fillStyle = h % 2 ? '#3a4462' : '#333c57'; tctx.fillRect(Math.round(h / 24 * W), barY, Math.round(W / 24), barH); }
   for (const s of segs) {
+    const x = Math.round(s.start / 1440 * W / 4) * 4, x2 = Math.round(s.end / 1440 * W / 4) * 4;
     tctx.fillStyle = (ACTS[s.act] || ACTS.etc).color;
-    tctx.fillRect(s.start / 1440 * tw, 0, (s.end - s.start) / 1440 * tw, 26);
+    tctx.fillRect(x, barY, Math.max(4, x2 - x), barH);
+    tctx.fillStyle = 'rgba(255,255,255,0.35)'; tctx.fillRect(x, barY, Math.max(4, x2 - x), 4);
+    tctx.fillStyle = K; tctx.fillRect(x, barY, 4, barH);
   }
-  tctx.fillStyle = getComputedStyle(document.body).color;
-  tctx.font = '11px sans-serif'; tctx.textAlign = 'center'; tctx.textBaseline = 'top';
+  tctx.fillStyle = K;
+  tctx.fillRect(0, barY - 4, W, 4); tctx.fillRect(0, barY + barH, W, 4);
+  tctx.font = '20px Galmuri11'; tctx.textBaseline = 'top';
   for (let h = 0; h <= 24; h += 3) {
-    const x = Math.min(tw - 10, Math.max(10, h / 24 * tw));
-    tctx.fillRect(h / 24 * tw, 26, 1, 4);
-    tctx.fillText(`${h}시`, x, 31);
+    const x = Math.round(h / 24 * W);
+    tctx.fillRect(Math.min(W - 4, x), barY + barH, 4, 8);
+    tctx.textAlign = h === 0 ? 'left' : h === 24 ? 'right' : 'center';
+    tctx.fillText(`${h}시`, x, barY + barH + 12);
   }
-  const px = t / 1440 * tw;
-  tctx.fillStyle = '#e8743b'; tctx.fillRect(px - 1.5, 0, 3, 30);
+  const px = Math.round(t / 1440 * W / 4) * 4;
+  tctx.fillStyle = K; tctx.fillRect(px - 4, 0, 12, barY + barH + 4);
+  tctx.fillStyle = '#ef7d57'; tctx.fillRect(px, 0, 4, barY + barH);
+  tctx.fillStyle = K; tctx.fillRect(px - 8, 0, 20, 4);
 }
 
-// ---------- 재생 ----------
+// ================= 재생 =================
 let simT = isToday() ? nowMin() : 0;
 let playing = false;
 let last = performance.now();
+const playBtn = document.getElementById('play');
+const speedSel = document.getElementById('speed');
 
 function frame(now) {
   const dt = (now - last) / 1000; last = now;
@@ -376,19 +605,14 @@ function frame(now) {
     if (simT >= 1440) { simT = 1440; setPlaying(false); }
   }
   const segs = segments();
-  drawWorld(Math.min(simT, 1439.99), segs, now);
+  drawFrame(Math.min(simT, 1439.99), segs, now);
   drawTimeline(simT, segs);
-  clockEl.textContent = fmt(Math.min(simT, 1439.99));
   requestAnimationFrame(frame);
 }
 
-const playBtn = document.getElementById('play');
-const speedSel = document.getElementById('speed');
-const clockEl = document.getElementById('clock');
-
 function setPlaying(v) {
   playing = v;
-  playBtn.textContent = v ? '⏸ 일시정지' : '▶ 재생';
+  playBtn.textContent = v ? 'Ⅱ 일시정지' : '▶ 재생';
 }
 playBtn.onclick = () => {
   if (!playing && simT >= 1440) simT = 0;
@@ -400,7 +624,7 @@ tl.onclick = e => {
   simT = Math.max(0, Math.min(1439.99, (e.clientX - r.left) / r.width * 1440));
 };
 
-// ---------- 입력 UI ----------
+// ================= 입력 UI =================
 const quick = document.getElementById('quick');
 const fAct = document.getElementById('fAct');
 const fPlace = document.getElementById('fPlace');
@@ -409,12 +633,13 @@ const dateInput = document.getElementById('date');
 
 for (const [id, a] of Object.entries(ACTS)) {
   const b = document.createElement('button');
-  b.innerHTML = `<span>${a.emoji}</span>${a.name}`;
+  b.style.borderBottomColor = a.color;
+  b.append(iconCanvas(id), a.name);
   b.onclick = () => startNow(id);
   quick.appendChild(b);
-  fAct.add(new Option(`${a.emoji} ${a.name}`, id));
+  fAct.add(new Option(a.name, id));
 }
-for (const [id, p] of Object.entries(PLACES)) fPlace.add(new Option(`${p.emoji} ${p.name}`, id));
+for (const [id, p] of Object.entries(PLACES)) fPlace.add(new Option(p.name, id));
 fAct.onchange = () => { fPlace.value = ACTS[fAct.value].place; };
 fPlace.value = ACTS[fAct.value].place;
 
@@ -438,21 +663,22 @@ document.getElementById('form').onsubmit = e => {
 };
 
 function renderList() {
+  document.getElementById('listTitle').textContent = isToday() ? '오늘의 기록' : `${day} 기록`;
   const segs = segments();
   list.innerHTML = '';
-  if (!entries.length) { list.innerHTML = '<li class="empty">아직 기록이 없어요. 위에서 지금 하는 일을 눌러 보세요.</li>'; return; }
+  if (!entries.length) { list.innerHTML = '<li class="empty">아직 기록이 없어요. 지금 하는 일을 눌러 보세요.</li>'; return; }
   for (const e of entries) {
-    const a = ACTS[e.act] || ACTS.etc, s = segs.find(x => x.id === e.id);
-    const li = document.createElement('li');
+    const act = ACTS[e.act] ? e.act : 'etc', a = ACTS[act], s = segs.find(x => x.id === e.id);
     const endTxt = e.end == null ? (isToday() ? '진행 중' : fmt(s ? s.end : 1440)) : (e.end >= 1440 ? '24:00' : fmt(e.end));
-    li.innerHTML = `<span class="dot" style="background:${a.color}"></span>
-      <span class="time">${fmt(e.start)} – ${endTxt}</span>
-      <div class="what">${a.emoji} ${a.name} · ${PLACES[e.place].name}${e.memo ? `<div class="memo"></div>` : ''}</div>`;
-    if (e.memo) li.querySelector('.memo').textContent = e.memo;
-    const del = document.createElement('button');
-    del.textContent = '삭제';
+    const li = document.createElement('li');
+    const chip = document.createElement('span'); chip.className = 'chip'; chip.style.background = a.color;
+    const time = document.createElement('span'); time.className = 'time'; time.textContent = `${fmt(e.start)} - ${endTxt}`;
+    const what = document.createElement('div'); what.className = 'what';
+    what.textContent = `${a.name} · ${PLACES[e.place].name}`;
+    if (e.memo) { const m = document.createElement('div'); m.className = 'memo'; m.textContent = e.memo; what.appendChild(m); }
+    const del = document.createElement('button'); del.textContent = '삭제';
     del.onclick = () => { entries = entries.filter(x => x.id !== e.id); save(); renderList(); };
-    li.appendChild(del);
+    li.append(chip, iconCanvas(act), time, what, del);
     list.appendChild(li);
   }
 }
@@ -470,7 +696,11 @@ document.getElementById('fEnd').value = nowHM();
 
 load(); renderList();
 setInterval(() => { if (isToday()) renderList(); }, 60000);
-requestAnimationFrame(frame);
+
+BG = buildBackground();
+Promise.all([document.fonts.load('24px Galmuri11'), document.fonts.load('700 24px Galmuri11')])
+  .catch(() => {})
+  .then(() => requestAnimationFrame(frame));
 </script>
 </body>
 </html>
